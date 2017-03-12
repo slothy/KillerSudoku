@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <title>Killer Sudoku-Aid!</title>
+    <link href="favicon.ico" rel="icon" type="image/x-icon" />
+    <link href="css/style.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Sanchez" rel="stylesheet" />
+    <script src="js/puzzles.js" type="text/javascript"></script>
+    <script src="js/index.js" type="text/javascript"></script>
+    <script src="js/main.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <h1>Killer Sudoku-Aid!</h1>
+
+    <p>(Like lemonade, only better for your health and general wellbeing)</p>
+
+    <p><input id="checkbox" type="checkbox" onclick="togglePossible(CELLS)"> Show Possible Candidates</input></p>
+
+    <div id="buttons">
+        <button id="hint" type="button" onclick="hint()">Gimme a Hint</button>
+        <button id="next" type="button" onclick="next()">Next Puzzle</button>
+        <button id="clear" type="button" onclick="clearBoard()">Start Again</button>
+        <p>Puzzle No: </p>
+    </div>
+
+    <div id="board" class="board"></div>
+</body>
+
+</html>

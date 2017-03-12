@@ -1,0 +1,5 @@
+************************************ TO DO LIST ************************************
+
+1. Add helper methods that tell me if a cage is completely inside a set of columns or rows and if not how many cells are outliers.
+2. Fix the colouration method so that if a cage comes up with no colour, re-run the method again until the whole board is coloured.
+3.
