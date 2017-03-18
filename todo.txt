@@ -3,3 +3,12 @@
 1. Add helper methods that tell me if a cage is completely inside a set of columns or rows and if not how many cells are outliers.
 2. Fix the colouration method so that if a cage comes up with no colour, re-run the method again until the whole board is coloured.
 3.
+
+1. Hidden Singles
+2. Hidden Pair/Triples
+3. Naked Singles
+4. Naked Pair/Triples
+5. Quads
+6. Innies/Outies 1 Cell
+7. Pointing Pairs
+8. 

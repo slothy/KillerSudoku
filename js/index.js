@@ -120,6 +120,7 @@ function next()
     colourBoard();
     var tmp = PUZZLE_POSITION + 1;
     console.log("Puzzle " + tmp + " loaded");
+    puzzleNo();
 }
 
 // A function that only allows the valid characters 1-9 in the cells and checks to see if they are legal
@@ -255,13 +256,13 @@ function cellsAroundCage(cage)
     return surroundingCells;
 }
 
-// Given a sudoku cell number, returns the row
+// Given a sudoku cell number, returns the row number
 function returnRow(cell)
 {
     return Math.floor(cell / 9);
 }
 
-// Given a sudoku cell number, returns the column
+// Given a sudoku cell number, returns the column number
 function returnCol(cell)
 {
     return cell % 9;
@@ -519,7 +520,6 @@ function possibleValues(sudoku)
         }
         if (possible[i].length == 0)
         {
-            alert("Go back and check previous entries, there's an illegal value somewhere!");
             ERROR_FLAG = 1;
         }
     }
@@ -591,9 +591,13 @@ function togglePossible(sudoku)
     }
 }
 
-function checkCages()
+function puzzleNo()
 {
-
+    var tmp = "Puzzle No: ";
+    var tmp2 = PUZZLE_POSITION + 1;
+    var tmp3 = PUZZLES.length;
+    var tmp4 = tmp + tmp2 + " / " + tmp3;
+    document.getElementById("puzzleNo").innerHTML = tmp4;
 }
 
 /******************** MAIN EXECUTION LOOP METHOD ********************/
@@ -603,16 +607,34 @@ function hint()
     console.log("Starting hint loop...");
     LOOP_COUNTER = 0;
     SOLVED_CELL_FLAG = 0;
-    while (SOLVED_CELL_FLAG == 0 && LOOP_COUNTER < 2 && ERROR_FLAG != 1)
+    ERROR_FLAG = 0;
+    while (SOLVED_CELL_FLAG == 0 && LOOP_COUNTER < 7 && ERROR_FLAG != 1)
     {
-        killerCombinationsCleanUp();
+        checkForSolvedCells();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+        lastNumberInCage();
+        if (SOLVED_CELL_FLAG == 1) break;
         LOOP_COUNTER += 1;
         checkForSolvedCells();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+        killerCombinationsCleanUp();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+        checkForSolvedCells();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+        lastNumberInCage();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+        checkForSolvedCells();
+        if (SOLVED_CELL_FLAG == 1) break;
         LOOP_COUNTER += 1;
     }
     if (ERROR_FLAG == 1)
     {
-        alert("Go back and fix your mistakes, then you will be able to progress");
+        alert("Go back and check previous entries, there's an illegal value somewhere!");
     }
 }
 
@@ -635,8 +657,51 @@ function checkForSolvedCells()
     }
 }
 
+function lastNumberInCage()
+{
+    var puzzle = PUZZLES[PUZZLE_POSITION];
+
+    for (var i = 0; i < puzzle.length; i++)
+    {
+        var cells = puzzle[i].squares;
+        var sum = puzzle[i].sum;
+        var counter = 0;
+        var total = 0;
+        var threshold = cells.length - 1;
+        for (var j = 0; j < cells.length; j++)
+        {
+            if (POSSIBLE[cells[j]].length == 1)
+            {
+                counter += 1;
+                total += Number(POSSIBLE[cells[j]][0]);
+            }
+        }
+        if (threshold == counter)
+        {
+            for (var k = 0; k < cells.length; k++)
+            {
+                if (POSSIBLE[cells[k]].length != 1)
+                {
+                    var newVal = sum - total;
+                    POSSIBLE[cells[k]].length = 0;
+                    POSSIBLE[cells[k]].push(newVal);
+                    CELLS[cells[j]] = newVal;
+                }
+            }
+        }
+    }
+}
+
 function killerCombinationsCleanUp()
 {
     console.log("Applying killer combinations and updating possible values");
     POSSIBLE = possibleValues(CELLS);
+}
+
+function hiddenSingles()
+{
+    for (var i = 0; i < CELLS.length; i++)
+    {
+
+    }
 }

@@ -4,4 +4,5 @@ document.addEventListener("DOMContentLoaded", function(event)
     createBoard("board");
     addCages(0);
     colourBoard();
+    puzzleNo();
 });
