@@ -697,11 +697,3 @@ function killerCombinationsCleanUp()
     console.log("Applying killer combinations and updating possible values");
     POSSIBLE = possibleValues(CELLS);
 }
-
-function hiddenSingles()
-{
-    for (var i = 0; i < CELLS.length; i++)
-    {
-
-    }
-}
