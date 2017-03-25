@@ -600,44 +600,6 @@ function puzzleNo()
     document.getElementById("puzzleNo").innerHTML = tmp4;
 }
 
-/******************** MAIN EXECUTION LOOP METHOD ********************/
-
-function hint()
-{
-    console.log("Starting hint loop...");
-    LOOP_COUNTER = 0;
-    SOLVED_CELL_FLAG = 0;
-    ERROR_FLAG = 0;
-    while (SOLVED_CELL_FLAG == 0 && LOOP_COUNTER < 7 && ERROR_FLAG != 1)
-    {
-        checkForSolvedCells();
-        if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
-        lastNumberInCage();
-        if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
-        checkForSolvedCells();
-        if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
-        killerCombinationsCleanUp();
-        if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
-        checkForSolvedCells();
-        if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
-        lastNumberInCage();
-        if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
-        checkForSolvedCells();
-        if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
-    }
-    if (ERROR_FLAG == 1)
-    {
-        alert("Go back and check previous entries, there's an illegal value somewhere!");
-    }
-}
-
 /************************ STRATEGTY METHODS ************************/
 
 function checkForSolvedCells()
@@ -692,8 +654,163 @@ function lastNumberInCage()
     }
 }
 
+function lastNumberInRow()
+{
+    var puzzle = PUZZLES[PUZZLE_POSITION];
+
+    for (var i = 0; i < puzzle.length; i++)
+    {
+        var counter = 0;
+        var total = 0;
+        var threshold = 8;
+        for (var j = 0; j < 9; j++)
+        {
+            if (returnRow(i) == j)
+            {
+                if (POSSIBLE[i].length == 1)
+                {
+                    counter += 1;
+                    total += Number(POSSIBLE[i][0]);
+                }
+            }
+        }
+        if (threshold == counter)
+        {
+            for (var k = 0; k < 9; k++)
+            {
+                if (returnRow(i) == k)
+                {
+                    if (POSSIBLE[i].length != 1)
+                    {
+                        var newVal = sum - total;
+                        POSSIBLE[i].length = 0;
+                        POSSIBLE[i].push(newVal);
+                        CELLS[i] = newVal;
+                    }
+                }
+            }
+        }
+    }
+}
+
+function lastNumberInCol()
+{
+    var puzzle = PUZZLES[PUZZLE_POSITION];
+
+    for (var i = 0; i < puzzle.length; i++)
+    {
+        var counter = 0;
+        var total = 0;
+        var threshold = 8;
+        for (var j = 0; j < 9; j++)
+        {
+            if (returnCol(i) == j)
+            {
+                if (POSSIBLE[i].length == 1)
+                {
+                    counter += 1;
+                    total += Number(POSSIBLE[i][0]);
+                }
+            }
+        }
+        if (threshold == counter)
+        {
+            for (var k = 0; k < 9; k++)
+            {
+                if (returnCol(i) == k)
+                {
+                    if (POSSIBLE[i].length != 1)
+                    {
+                        var newVal = sum - total;
+                        POSSIBLE[i].length = 0;
+                        POSSIBLE[i].push(newVal);
+                        CELLS[i] = newVal;
+                    }
+                }
+            }
+        }
+    }
+}
+
+function lastNumberInBlock()
+{
+    var puzzle = PUZZLES[PUZZLE_POSITION];
+
+    for (var i = 0; i < puzzle.length; i++)
+    {
+        var counter = 0;
+        var total = 0;
+        var threshold = 8;
+        for (var j = 0; j < 9; j++)
+        {
+            if (returnBlock(i) == j)
+            {
+                if (POSSIBLE[i].length == 1)
+                {
+                    counter += 1;
+                    total += Number(POSSIBLE[i][0]);
+                }
+            }
+        }
+        if (threshold == counter)
+        {
+            for (var k = 0; k < 9; k++)
+            {
+                if (returnBlock(i) == k)
+                {
+                    if (POSSIBLE[i].length != 1)
+                    {
+                        var newVal = sum - total;
+                        POSSIBLE[i].length = 0;
+                        POSSIBLE[i].push(newVal);
+                        CELLS[i] = newVal;
+                    }
+                }
+            }
+        }
+    }
+}
+
 function killerCombinationsCleanUp()
 {
     console.log("Applying killer combinations and updating possible values");
     POSSIBLE = possibleValues(CELLS);
+}
+
+/******************** MAIN EXECUTION LOOP METHOD ********************/
+
+function hint()
+{
+    console.log("Starting hint loop...");
+    LOOP_COUNTER = 0;
+    SOLVED_CELL_FLAG = 0;
+    ERROR_FLAG = 0;
+    while (SOLVED_CELL_FLAG == 0 && LOOP_COUNTER < 7 && ERROR_FLAG != 1)
+    {
+        killerCombinationsCleanUp();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+        checkForSolvedCells();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+        lastNumberInCage();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+        lastNumberInRow();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+        lastNumberInCol();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+        lastNumberInBlock();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+        checkForSolvedCells();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+    }
+    if (ERROR_FLAG == 1)
+    {
+        alert("Go back and check previous entries, there's an illegal value somewhere!");
+    }
 }
