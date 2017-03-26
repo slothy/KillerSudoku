@@ -135,7 +135,7 @@ function checkInvalidChars(event, ob)
     if (invalidChars.test(ob.value))
     {
         ob.value = ob.value.replace(invalidChars, EMPTY);
-        alert("The character you entered is not valid for Killer Sudoku");
+        $.notify("The character you entered is not valid for Killer Sudoku",{position:"top left"});
     }
 		for (var i = 0; i < VALID_KEY_CODES.length; i++)
 		{
@@ -155,7 +155,7 @@ function checkInvalidChars(event, ob)
                 }
                 if (counter == possible[cell].length)
                 {
-                    alert(ob.value + " is not a legal number in cell " + ob.id);
+                    $.notify(ob.value + " is not a legal number in cell " + ob.id,{position:"top left"});
                     CELLS[ob.id] = 0;
                     ob.value = EMPTY;
                 }
