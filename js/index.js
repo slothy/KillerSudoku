@@ -135,7 +135,7 @@ function checkInvalidChars(event, ob)
     if (invalidChars.test(ob.value))
     {
         ob.value = ob.value.replace(invalidChars, EMPTY);
-        $.notify("The character you entered is not valid for Killer Sudoku",{position:"top left"});
+        $.notify("The character you entered is not valid for Killer Sudoku",{position:"top left",autoHideDelay:9000});
     }
 		for (var i = 0; i < VALID_KEY_CODES.length; i++)
 		{
@@ -155,7 +155,7 @@ function checkInvalidChars(event, ob)
                 }
                 if (counter == possible[cell].length)
                 {
-                    $.notify(ob.value + " is not a legal number in cell " + ob.id,{position:"top left"});
+                    $.notify(ob.value + " is not a legal number in cell " + ob.id,{position:"top left",autoHideDelay:9000});
                     CELLS[ob.id] = 0;
                     ob.value = EMPTY;
                 }
@@ -619,7 +619,7 @@ function checkForSolvedCells()
     }
 }
 
-function lastNumberInCage()
+function nakedSingleCage()
 {
     var puzzle = PUZZLES[PUZZLE_POSITION];
 
@@ -654,7 +654,7 @@ function lastNumberInCage()
     }
 }
 
-function lastNumberInRow()
+function nakedSingleRow()
 {
     var puzzle = PUZZLES[PUZZLE_POSITION];
 
@@ -693,7 +693,7 @@ function lastNumberInRow()
     }
 }
 
-function lastNumberInCol()
+function nakedSingleCol()
 {
     var puzzle = PUZZLES[PUZZLE_POSITION];
 
@@ -732,7 +732,7 @@ function lastNumberInCol()
     }
 }
 
-function lastNumberInBlock()
+function nakedSingleBlock()
 {
     var puzzle = PUZZLES[PUZZLE_POSITION];
 
@@ -774,7 +774,37 @@ function lastNumberInBlock()
 function killerCombinationsCleanUp()
 {
     console.log("Applying killer combinations and updating possible values");
+    $.notify("Applying killer combinations and updating possible values", "info", {position:"top left",autoHideDelay:9000});
     POSSIBLE = possibleValues(CELLS);
+}
+
+function hiddenSingle()
+{
+    for (var i = 0; i < POSSIBLE.length; i++)
+    {
+        if (POSSIBLE[i].length > 1)
+        {
+            for (var j = 0; j < POSSIBLE[i].length; j++)
+            {
+                for (var k = 0; k < CELLS.length; k++)
+                {
+                    if (returnCol(k) == returnCol(POSSIBLE[i][j]))
+                    {
+                        
+                    }
+                    if (returnRow(k) == returnRow(POSSIBLE[i][j]))
+                    {
+                    }
+                    if (returnBlock(k) == returnBlock(POSSIBLE[i][j]))
+                    {
+                    }
+                    if (returnCage(k) == returnCage(POSSIBLE[i][j]))
+                    {
+                    }
+                }
+            }
+        }
+    }
 }
 
 /******************** MAIN EXECUTION LOOP METHOD ********************/
@@ -785,24 +815,30 @@ function hint()
     LOOP_COUNTER = 0;
     SOLVED_CELL_FLAG = 0;
     ERROR_FLAG = 0;
-    while (SOLVED_CELL_FLAG == 0 && LOOP_COUNTER < 7 && ERROR_FLAG != 1)
+    while (SOLVED_CELL_FLAG == 0 && LOOP_COUNTER < 9 && ERROR_FLAG != 1)
     {
         killerCombinationsCleanUp();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+        nakedSingleCage();
         if (SOLVED_CELL_FLAG == 1) break;
         LOOP_COUNTER += 1;
         checkForSolvedCells();
         if (SOLVED_CELL_FLAG == 1) break;
         LOOP_COUNTER += 1;
-        lastNumberInCage();
+        nakedSingleRow();
         if (SOLVED_CELL_FLAG == 1) break;
         LOOP_COUNTER += 1;
-        lastNumberInRow();
+        checkForSolvedCells();
         if (SOLVED_CELL_FLAG == 1) break;
         LOOP_COUNTER += 1;
-        lastNumberInCol();
+        nakedSingleCol();
         if (SOLVED_CELL_FLAG == 1) break;
         LOOP_COUNTER += 1;
-        lastNumberInBlock();
+        checkForSolvedCells();
+        if (SOLVED_CELL_FLAG == 1) break;
+        LOOP_COUNTER += 1;
+        nakedSingleBlock();
         if (SOLVED_CELL_FLAG == 1) break;
         LOOP_COUNTER += 1;
         checkForSolvedCells();
@@ -811,6 +847,6 @@ function hint()
     }
     if (ERROR_FLAG == 1)
     {
-        alert("Go back and check previous entries, there's an illegal value somewhere!");
+        $.notify("Go back and check previous entries, there's an illegal value somewhere!",{position:"top left",autoHideDelay:9000});
     }
 }
