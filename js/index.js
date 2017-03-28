@@ -602,7 +602,7 @@ function puzzleNo()
 
 /************************ STRATEGTY METHODS ************************/
 
-function checkForSolvedCells()
+function nakedSingles()
 {
     console.log("Checking for solved cells");
     var board = document.getElementById('board');
@@ -619,7 +619,7 @@ function checkForSolvedCells()
     }
 }
 
-function nakedSingleCage()
+function lastInCage()
 {
     var puzzle = PUZZLES[PUZZLE_POSITION];
 
@@ -654,7 +654,7 @@ function nakedSingleCage()
     }
 }
 
-function nakedSingleRow()
+function lastInRow()
 {
     var puzzle = PUZZLES[PUZZLE_POSITION];
 
@@ -693,7 +693,7 @@ function nakedSingleRow()
     }
 }
 
-function nakedSingleCol()
+function lastInCol()
 {
     var puzzle = PUZZLES[PUZZLE_POSITION];
 
@@ -732,7 +732,7 @@ function nakedSingleCol()
     }
 }
 
-function nakedSingleBlock()
+function lastInBlock()
 {
     var puzzle = PUZZLES[PUZZLE_POSITION];
 
@@ -778,29 +778,69 @@ function killerCombinationsCleanUp()
     POSSIBLE = possibleValues(CELLS);
 }
 
-function hiddenSingle()
+function hiddenSingles()
 {
+    loop:
     for (var i = 0; i < POSSIBLE.length; i++)
     {
+        var row = 0;
+        var col = 0;
+        var block = 0;
+        var cage = 0;
         if (POSSIBLE[i].length > 1)
         {
             for (var j = 0; j < POSSIBLE[i].length; j++)
             {
                 for (var k = 0; k < CELLS.length; k++)
                 {
-                    if (returnCol(k) == returnCol(POSSIBLE[i][j]))
+                    if (returnCol(k) == returnCol(POSSIBLE[i][j]) && k != i && col == 0)
                     {
-                        
+                        for (var l = 0; l < POSSIBLE[k].length; l++)
+                        {
+                            if (POSSIBLE[k][l] == POSSIBLE[i][j])
+                            {
+                                col = 1;
+                            }
+                        }
                     }
-                    if (returnRow(k) == returnRow(POSSIBLE[i][j]))
+                    if (returnRow(k) == returnRow(POSSIBLE[i][j]) && k != i && row == 0)
                     {
+                        for (var m = 0; m < POSSIBLE[k].length; m++)
+                        {
+                            if (POSSIBLE[k][m] == POSSIBLE[i][j])
+                            {
+                                row = 1;
+                            }
+                        }
                     }
-                    if (returnBlock(k) == returnBlock(POSSIBLE[i][j]))
+                    if (returnBlock(k) == returnBlock(POSSIBLE[i][j]) && k != i && block == 0)
                     {
+                        for (var n = 0; n < POSSIBLE[k].length; n++)
+                        {
+                            if (POSSIBLE[k][n] == POSSIBLE[i][j])
+                            {
+                                block = 1;
+                            }
+                        }
                     }
-                    if (returnCage(k) == returnCage(POSSIBLE[i][j]))
+                    if (returnCage(k) == returnCage(POSSIBLE[i][j]) && k != i && cage == 0)
                     {
+                        for (var o = 0; o < POSSIBLE[k].length; o++)
+                        {
+                            if (POSSIBLE[k][o] == POSSIBLE[i][j])
+                            {
+                                cage = 1;
+                            }
+                        }
                     }
+                }
+                if (row == 0 && col == 0 && block == 0 && cage == 0)
+                {
+                    var tmp = POSSIBLE[i][j];
+                    POSSIBLE[i].length = 0;
+                    POSSIBLE[i].push(tmp);
+                    SOLVED_CELL_FLAG = 1;
+                    break loop;
                 }
             }
         }
@@ -815,33 +855,33 @@ function hint()
     LOOP_COUNTER = 0;
     SOLVED_CELL_FLAG = 0;
     ERROR_FLAG = 0;
-    while (SOLVED_CELL_FLAG == 0 && LOOP_COUNTER < 9 && ERROR_FLAG != 1)
+    while (SOLVED_CELL_FLAG == 0 && LOOP_COUNTER < 11 && ERROR_FLAG != 1)
     {
         killerCombinationsCleanUp();
+        LOOP_COUNTER += 1;
+        hiddenSingles();
+        LOOP_COUNTER += 1;
+        nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
         LOOP_COUNTER += 1;
-        nakedSingleCage();
+        lastInCage();
+        LOOP_COUNTER += 1;
+        nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
         LOOP_COUNTER += 1;
-        checkForSolvedCells();
+        lastInRow();
+        LOOP_COUNTER += 1;
+        nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
         LOOP_COUNTER += 1;
-        nakedSingleRow();
+        lastInCol();
+        LOOP_COUNTER += 1;
+        nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
         LOOP_COUNTER += 1;
-        checkForSolvedCells();
-        if (SOLVED_CELL_FLAG == 1) break;
+        lastInBlock();
         LOOP_COUNTER += 1;
-        nakedSingleCol();
-        if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
-        checkForSolvedCells();
-        if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
-        nakedSingleBlock();
-        if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
-        checkForSolvedCells();
+        nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
         LOOP_COUNTER += 1;
     }
