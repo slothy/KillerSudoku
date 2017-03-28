@@ -7,7 +7,6 @@ var BOARD_SIZE = 9;                                                     // Width
 var EMPTY = "";                                                         // Empty cell marker
 var PUZZLES = [puzzle1,puzzle2];                                       	// An array to hold all of the puzzles in the site
 var PUZZLE_POSITION;                                                    // The current position in the puzzles array
-var LOOP_COUNTER = 0;
 var SOLVED_CELL_FLAG = 0;
 var ERROR_FLAG = 0;
 
@@ -604,7 +603,6 @@ function puzzleNo()
 
 function nakedSingles()
 {
-    console.log("Checking for solved cells");
     var board = document.getElementById('board');
     var tds = board.querySelectorAll('td');
     var inputs = board.querySelectorAll('input');
@@ -773,8 +771,7 @@ function lastInBlock()
 
 function killerCombinationsCleanUp()
 {
-    console.log("Applying killer combinations and updating possible values");
-    $.notify("Applying killer combinations and updating possible values", "info", {position:"top left",autoHideDelay:9000});
+    //$.notify("Applying killer combinations and updating possible values", "info", {position:"top left",autoHideDelay:9000});
     POSSIBLE = possibleValues(CELLS);
 }
 
@@ -793,7 +790,7 @@ function hiddenSingles()
             {
                 for (var k = 0; k < CELLS.length; k++)
                 {
-                    if (returnCol(k) == returnCol(POSSIBLE[i][j]) && k != i && col == 0)
+                    if (returnCol(k) == returnCol(i) && k != i && col == 0)
                     {
                         for (var l = 0; l < POSSIBLE[k].length; l++)
                         {
@@ -803,7 +800,7 @@ function hiddenSingles()
                             }
                         }
                     }
-                    if (returnRow(k) == returnRow(POSSIBLE[i][j]) && k != i && row == 0)
+                    if (returnRow(k) == returnRow(i) && k != i && row == 0)
                     {
                         for (var m = 0; m < POSSIBLE[k].length; m++)
                         {
@@ -813,7 +810,7 @@ function hiddenSingles()
                             }
                         }
                     }
-                    if (returnBlock(k) == returnBlock(POSSIBLE[i][j]) && k != i && block == 0)
+                    if (returnBlock(k) == returnBlock(i) && k != i && block == 0)
                     {
                         for (var n = 0; n < POSSIBLE[k].length; n++)
                         {
@@ -823,7 +820,7 @@ function hiddenSingles()
                             }
                         }
                     }
-                    if (returnCage(k) == returnCage(POSSIBLE[i][j]) && k != i && cage == 0)
+                    if (returnCage(k) == returnCage(i) && k != i && cage == 0)
                     {
                         for (var o = 0; o < POSSIBLE[k].length; o++)
                         {
@@ -834,15 +831,30 @@ function hiddenSingles()
                         }
                     }
                 }
-                if (row == 0 && col == 0 && block == 0 && cage == 0)
+                if (row == 0 || col == 0 || block == 0 || cage == 0)
                 {
                     var tmp = POSSIBLE[i][j];
                     POSSIBLE[i].length = 0;
                     POSSIBLE[i].push(tmp);
-                    SOLVED_CELL_FLAG = 1;
                     break loop;
                 }
             }
+        }
+    }
+}
+
+function complexHiddenSingles()
+{
+    puzzle = PUZZLES[PUZZLE_POSITION];
+    for (var i = 0; i < puzzle.length; i++)
+    {
+        // Iterate through each cage
+        // For each possible number in each cell of the cage, compare it with all the other possible numbers in the other cells
+        // If any numbers are the same, mark a flag
+        // If at the end, the possible number in question is unique and the flag is still 0, then that number is the correct number for that cell
+        for (var j = 0; j < puzzle[i].length; j++)
+        {
+
         }
     }
 }
@@ -852,41 +864,35 @@ function hiddenSingles()
 function hint()
 {
     console.log("Starting hint loop...");
-    LOOP_COUNTER = 0;
     SOLVED_CELL_FLAG = 0;
     ERROR_FLAG = 0;
-    while (SOLVED_CELL_FLAG == 0 && LOOP_COUNTER < 11 && ERROR_FLAG != 1)
+    var counter = 0;
+    while (SOLVED_CELL_FLAG == 0 && ERROR_FLAG == 0 && counter < 25)
     {
         killerCombinationsCleanUp();
-        LOOP_COUNTER += 1;
         hiddenSingles();
-        LOOP_COUNTER += 1;
         nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
         lastInCage();
-        LOOP_COUNTER += 1;
         nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
         lastInRow();
-        LOOP_COUNTER += 1;
         nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
         lastInCol();
-        LOOP_COUNTER += 1;
         nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
         lastInBlock();
-        LOOP_COUNTER += 1;
         nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
-        LOOP_COUNTER += 1;
+        counter += 1;
     }
     if (ERROR_FLAG == 1)
     {
         $.notify("Go back and check previous entries, there's an illegal value somewhere!",{position:"top left",autoHideDelay:9000});
+    }
+    if (SOLVED_CELL_FLAG == 1)
+    {
+        $.notify("Solved a Cell!",{position:"top left",autoHideDelay:9000});
     }
 }
