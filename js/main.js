@@ -5,4 +5,5 @@ document.addEventListener("DOMContentLoaded", function(event)
     addCages(0);
     colourBoard();
     puzzleNo();
+    console.log("Finished loading page");
 });
