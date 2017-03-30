@@ -852,9 +852,43 @@ function complexHiddenSingles()
         // For each possible number in each cell of the cage, compare it with all the other possible numbers in the other cells
         // If any numbers are the same, mark a flag
         // If at the end, the possible number in question is unique and the flag is still 0, then that number is the correct number for that cell
-        for (var j = 0; j < puzzle[i].length; j++)
+        var cells = puzzle[i].squares;
+        loop:
+        for (var j = 0; j < cells.length; j++)
         {
-
+            var counter = 0;
+            var cellCount = 0;
+            for (var k = 0; k < POSSIBLE[cells[j]].length; k++)
+            {
+                for (var l = 0; l < cells.length; l++)
+                {
+                    if (l != j)
+                    {
+                        for (var m = 0; m < POSSIBLE[cells[l]].length; m++)
+                        {
+                            if (POSSIBLE[cells[j]][k] == POSSIBLE[cells[l]][m])
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                counter +=1;
+                            }
+                        }
+                        if (counter == POSSIBLE[cells[l]].length)
+                        {
+                            cellCount += 1;
+                        }
+                    }
+                }
+                if (cellCount == cells.length - 1)
+                {
+                    var tmp = POSSIBLE[cells[j]][k];
+                    POSSIBLE[cells[j]].length = 0;
+                    POSSIBLE[cells[j]].push(tmp);
+                    break loop;
+                }
+            }
         }
     }
 }
@@ -871,6 +905,9 @@ function hint()
     {
         killerCombinationsCleanUp();
         hiddenSingles();
+        nakedSingles();
+        if (SOLVED_CELL_FLAG == 1) break;
+        complexHiddenSingles();
         nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
         lastInCage();
