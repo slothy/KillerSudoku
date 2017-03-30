@@ -613,6 +613,7 @@ function nakedSingles()
             inputs[i].value = POSSIBLE[i][0];
             CELLS[i] = POSSIBLE[i][0];
             SOLVED_CELL_FLAG = 1;
+            break;
         }
     }
 }
@@ -771,7 +772,6 @@ function lastInBlock()
 
 function killerCombinationsCleanUp()
 {
-    //$.notify("Applying killer combinations and updating possible values", "info", {position:"top left",autoHideDelay:9000});
     POSSIBLE = possibleValues(CELLS);
 }
 
@@ -783,55 +783,50 @@ function hiddenSingles()
         var row = 0;
         var col = 0;
         var block = 0;
-        var cage = 0;
         if (POSSIBLE[i].length > 1)
         {
             for (var j = 0; j < POSSIBLE[i].length; j++)
             {
-                for (var k = 0; k < CELLS.length; k++)
+                for (var int1 = 0; int1 < CELLS.length; int1++)
                 {
-                    if (returnCol(k) == returnCol(i) && k != i && col == 0)
+                    if (returnCol(int1) == returnCol(i) && int1 != i && col == 0)
                     {
-                        for (var l = 0; l < POSSIBLE[k].length; l++)
+                        for (var l = 0; l < POSSIBLE[int1].length; l++)
                         {
-                            if (POSSIBLE[k][l] == POSSIBLE[i][j])
+                            if (POSSIBLE[int1][l] == POSSIBLE[i][j])
                             {
                                 col = 1;
                             }
                         }
                     }
-                    if (returnRow(k) == returnRow(i) && k != i && row == 0)
+                }
+                for (var int2 = 0; int2 < CELLS.length; int2++)
+                {
+                    if (returnRow(int2) == returnRow(i) && int2 != i && row == 0)
                     {
-                        for (var m = 0; m < POSSIBLE[k].length; m++)
+                        for (var m = 0; m < POSSIBLE[int2].length; m++)
                         {
-                            if (POSSIBLE[k][m] == POSSIBLE[i][j])
+                            if (POSSIBLE[int2][m] == POSSIBLE[i][j])
                             {
                                 row = 1;
                             }
                         }
                     }
-                    if (returnBlock(k) == returnBlock(i) && k != i && block == 0)
+                }
+                for (var int3 = 0; int3 < CELLS.length; int3++)
+                {
+                    if (returnBlock(int3) == returnBlock(i) && int3 != i && block == 0)
                     {
-                        for (var n = 0; n < POSSIBLE[k].length; n++)
+                        for (var n = 0; n < POSSIBLE[int3].length; n++)
                         {
-                            if (POSSIBLE[k][n] == POSSIBLE[i][j])
+                            if (POSSIBLE[int3][n] == POSSIBLE[i][j])
                             {
                                 block = 1;
                             }
                         }
                     }
-                    if (returnCage(k) == returnCage(i) && k != i && cage == 0)
-                    {
-                        for (var o = 0; o < POSSIBLE[k].length; o++)
-                        {
-                            if (POSSIBLE[k][o] == POSSIBLE[i][j])
-                            {
-                                cage = 1;
-                            }
-                        }
-                    }
                 }
-                if (row == 0 || col == 0 || block == 0 || cage == 0)
+                if (row == 0 || col == 0 || block == 0)
                 {
                     var tmp = POSSIBLE[i][j];
                     POSSIBLE[i].length = 0;
@@ -843,55 +838,55 @@ function hiddenSingles()
     }
 }
 
-function complexHiddenSingles()
-{
-    puzzle = PUZZLES[PUZZLE_POSITION];
-    for (var i = 0; i < puzzle.length; i++)
-    {
-        // Iterate through each cage
-        // For each possible number in each cell of the cage, compare it with all the other possible numbers in the other cells
-        // If any numbers are the same, mark a flag
-        // If at the end, the possible number in question is unique and the flag is still 0, then that number is the correct number for that cell
-        var cells = puzzle[i].squares;
-        loop:
-        for (var j = 0; j < cells.length; j++)
-        {
-            var counter = 0;
-            var cellCount = 0;
-            for (var k = 0; k < POSSIBLE[cells[j]].length; k++)
-            {
-                for (var l = 0; l < cells.length; l++)
-                {
-                    if (l != j)
-                    {
-                        for (var m = 0; m < POSSIBLE[cells[l]].length; m++)
-                        {
-                            if (POSSIBLE[cells[j]][k] == POSSIBLE[cells[l]][m])
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                counter +=1;
-                            }
-                        }
-                        if (counter == POSSIBLE[cells[l]].length)
-                        {
-                            cellCount += 1;
-                        }
-                    }
-                }
-                if (cellCount == cells.length - 1)
-                {
-                    var tmp = POSSIBLE[cells[j]][k];
-                    POSSIBLE[cells[j]].length = 0;
-                    POSSIBLE[cells[j]].push(tmp);
-                    break loop;
-                }
-            }
-        }
-    }
-}
+// function complexHiddenSingles()
+// {
+//     puzzle = PUZZLES[PUZZLE_POSITION];
+//     for (var i = 0; i < puzzle.length; i++)
+//     {
+//         // Iterate through each cage
+//         // For each possible number in each cell of the cage, compare it with all the other possible numbers in the other cells
+//         // If any numbers are the same, mark a flag
+//         // If at the end, the possible number in question is unique and the flag is still 0, then that number is the correct number for that cell
+//         var cells = puzzle[i].squares;
+//         var counter = 0;
+//         var cellCount = 0;
+//         loop:
+//         for (var j = 0; j < cells.length; j++)
+//         {
+//             for (var k = 0; k < POSSIBLE[cells[j]].length; k++)
+//             {
+//                 for (var l = 0; l < cells.length; l++)
+//                 {
+//                     if (l != j)
+//                     {
+//                         for (var m = 0; m < POSSIBLE[cells[l]].length; m++)
+//                         {
+//                             if (POSSIBLE[cells[j]][k] == POSSIBLE[cells[l]][m])
+//                             {
+//                                 continue;
+//                             }
+//                             else
+//                             {
+//                                 counter +=1;
+//                             }
+//                         }
+//                         if (counter == POSSIBLE[cells[l]].length)
+//                         {
+//                             cellCount += 1;
+//                         }
+//                     }
+//                 }
+//                 if (cellCount == cells.length - 1)
+//                 {
+//                     var tmp = POSSIBLE[cells[j]][k];
+//                     POSSIBLE[cells[j]].length = 0;
+//                     POSSIBLE[cells[j]].push(tmp);
+//                     break loop;
+//                 }
+//             }
+//         }
+//     }
+// }
 
 /******************** MAIN EXECUTION LOOP METHOD ********************/
 
@@ -901,13 +896,12 @@ function hint()
     SOLVED_CELL_FLAG = 0;
     ERROR_FLAG = 0;
     var counter = 0;
-    while (SOLVED_CELL_FLAG == 0 && ERROR_FLAG == 0 && counter < 25)
+    while (SOLVED_CELL_FLAG == 0 && ERROR_FLAG == 0 && counter < 20)
     {
-        killerCombinationsCleanUp();
-        hiddenSingles();
         nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
-        complexHiddenSingles();
+        killerCombinationsCleanUp();
+        hiddenSingles();
         nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
         lastInCage();
@@ -930,6 +924,6 @@ function hint()
     }
     if (SOLVED_CELL_FLAG == 1)
     {
-        $.notify("Solved a Cell!",{position:"top left",autoHideDelay:9000});
+        $.notify("Solved a Cell!", "success",{position:"top left",autoHideDelay:9000});
     }
 }
