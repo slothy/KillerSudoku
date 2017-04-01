@@ -358,94 +358,6 @@ function isPossibleNumber(cell, number, sudoku)
 		return isPossibleRow(number, row, sudoku) && isPossibleCol(number, col, sudoku) && isPossibleBlock(number, block, sudoku) && isPossibleCage(number, cage, sudoku);
 }
 
-// Given a row and a sudoku, returns true if it's a legal row
-function isCorrectRow(row, sudoku)
-{
-  	var rightSequence = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9);
-  	var rowTemp = new Array();
-  	for (var i = 0; i < 9; i++)
-    {
-  		rowTemp[i] = sudoku[row * 9 + i];
-  	}
-  	rowTemp.sort();
-  	return rowTemp.join() == rightSequence.join();
-}
-
-// Given a column and a sudoku, returns true if it's a legal column
-function isCorrectCol(col, sudoku)
-{
-  	var rightSequence = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9);
-  	var colTemp = new Array();
-  	for (var i = 0; i < 9; i++)
-    {
-  		colTemp[i] = sudoku[col + i * 9];
-  	}
-  	colTemp.sort();
-  	return colTemp.join() == rightSequence.join();
-}
-
-// Given a 3x3 block and a sudoku, returns true if it's a legal block
-function isCorrectBlock(block, sudoku)
-{
-  	var rightSequence = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9);
-  	var blockTemp = new Array();
-  	for (var i = 0; i < 9; i++)
-    {
-  		blockTemp[i] = sudoku[Math.floor(block / 3) * 27 + i % 3 + 9 * Math.floor(i / 3) + 3 * (block % 3)];
-  	}
-  	blockTemp.sort();
-  	return blockTemp.join() == rightSequence.join();
-}
-
-// Given a cage and a sudoku, returns true if it's a legal cage
-function isCorrectCage(cage, sudoku)
-{
-    var finalArray = [];
-    var tmpArray = [];
-    var cellsInCage = cage.squares;
-    var numbersInCage = [];
-    var sumOfCage = cage.sum;
-    var fails = 0;
-    killerCombo(SUDOKU_VALUES, tmpArray, finalArray, sumOfCage, cellsInCage.length);
-    for (var j = 0; j < cellsInCage.length; j++)
-    {
-        numbersInCage.push(sudoku[cellsInCage[j]]);
-    }
-    numbersInCage.sort();
-    for (var i = 0; i < finalArray.length; i++)
-    {
-        for (var k = 0; k < finalArray[i].length; k++)
-        {
-            finalArray[i].sort();
-            if (finalArray[i][k] != numbersInCage[k])
-            {
-                fails += 1;
-            }
-        }
-    }
-    return !(fails == finalArray.length);
-}
-
-// Given a sudoku, returns true if the sudoku is solved
-function isSolvedSudoku(sudoku) {
-    var puzzle = PUZZLE[PUZZLE_POSITION];
-    for (var j = 0; j < puzzle.length; j++)
-    {
-        if(!isCorrectCage(puzzle[j], sudoku))
-        {
-            return false;
-        }
-    }
-  	for (var i = 0; i < 9; i++)
-    {
-  	    if (!isCorrectBlock(i,sudoku) || !isCorrectRow(i,sudoku) || !isCorrectCol(i,sudoku))
-        {
-  			     return false;
-  	    }
-  	}
-	  return true;
-}
-
 // Given a set of possible values for Sudoku, an array, a sum you're trying to reach
 // and the number of cells in the cage, return all possible cage combinations
 function killerCombo(SUDOKU_VALUES, tmpArray, finalArray, target, limit)
@@ -597,6 +509,63 @@ function puzzleNo()
     var tmp3 = PUZZLES.length;
     var tmp4 = tmp + tmp2 + " / " + tmp3;
     document.getElementById("puzzleNo").innerHTML = tmp4;
+}
+
+// Takes an array of arrays and returns all possible combinations
+// Outputs ["acd", "bcd", "azd", "bzd", "ace", "bce", "aze", "bze", "acf", "bcf", "azf", "bzf"]
+// From [['a', 'b'], ['c', 'z'], ['d', 'e', 'f']]
+function allCombinations(arr)
+{
+    if (arr.length === 0)
+    {
+        return [];
+    }
+    else if (arr.length === 1)
+    {
+        return arr[0];
+    }
+    else
+    {
+        var result = [];
+        var allCasesOfRest = allCombinations(arr.slice(1));  // recur with the rest of array
+        for (var c in allCasesOfRest)
+        {
+            for (var i = 0; i < arr[0].length; i++)
+            {
+                result.push(arr[0][i] + allCasesOfRest[c]);
+            }
+        }
+        return result;
+    }
+}
+
+function canCageAddUp(cage)
+{
+    var input = new Array();
+    var sum = cage.sum;
+    var cells = cage.squares;
+    var flag = 1;
+    for (var i = 0; i < cells.length; i++)
+    {
+        input.push(POSSIBLE[cells[i]]);
+    }
+    var output = allCombinations(input);
+    for (var k = 0; k < output.length; k++)
+    {
+        if (output[k] == sum)
+        {
+            flag = 0;
+            break;
+        }
+    }
+    if (flag == 1)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 /************************ STRATEGTY METHODS ************************/
@@ -888,13 +857,58 @@ function hiddenSingles()
 //     }
 // }
 
+function nakedPairs()
+{
+    for (var i = 0; i < POSSIBLE.length; i++)
+    {
+        var pair1 = 0;
+        var pair2 = 0;
+        var pairCell1 = 0;
+        var pairCell2 = 0;
+        if (POSSIBLE[i].length == 2)
+        {
+            pair1 = POSSIBLE[i][0];
+            pair2 = POSSIBLE[i][1];
+            pairCell1 = i;
+            for (var j = 0; j < POSSIBLE.length; j++)
+            {
+                if ( j != i && POSSIBLE[j].length == 2 && (returnRow(i) == returnRow(j) || returnCol(i) == returnCol(j) || returnBlock(i) == returnBlock(j) || returnCage(i) == returnCage(j)) )
+                {
+                    if (pair1 == POSSIBLE[j][0] && pair2 == POSSIBLE[j][1])
+                    {
+                        pairCell2 = j;
+                        for (var k = 0; k < POSSIBLE.length; k++)
+                        {
+                            if (k != pairCell1 && k != pairCell2 && ((returnRow(k) == returnRow(pairCell1) && returnRow(k) == returnRow(pairCell2)) || (returnCol(k) == returnCol(pairCell1) && returnCol(k) == returnCol(pairCell2))
+                            || (returnBlock(k) == returnBlock(pairCell1) && returnBlock(k) == returnBlock(pairCell2)) || (returnCage(k) == returnCage(pairCell1) && returnCage(k) == returnCage(pairCell2))) )
+                            {
+                                for (var l = 0; l < POSSIBLE[k].length; l++)
+                                {
+                                    if (POSSIBLE[k][l] == pair1 || POSSIBLE[k][l] == pair2)
+                                    {
+                                        var tmp = POSSIBLE[k];
+                                        POSSIBLE[k].splice(l, 1);
+                                        if (canCageAddUp(returnCage(pairCell1)) == false || canCageAddUp(returnCage(pairCell2)) == false)
+                                        {
+                                            POSSIBLE[k] = tmp;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 /******************** MAIN EXECUTION LOOP METHOD ********************/
 
 function hint()
 {
     console.log("Starting hint loop...");
     SOLVED_CELL_FLAG = 0;
-    ERROR_FLAG = 0;
     var counter = 0;
     while (SOLVED_CELL_FLAG == 0 && ERROR_FLAG == 0 && counter < 20)
     {
@@ -902,6 +916,9 @@ function hint()
         if (SOLVED_CELL_FLAG == 1) break;
         killerCombinationsCleanUp();
         hiddenSingles();
+        nakedSingles();
+        if (SOLVED_CELL_FLAG == 1) break;
+        nakedPairs();
         nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
         lastInCage();
@@ -924,6 +941,6 @@ function hint()
     }
     if (SOLVED_CELL_FLAG == 1)
     {
-        $.notify("Solved a Cell!", "success",{position:"top left",autoHideDelay:9000});
+        $.notify("Solved a Cell!",{position:"top left",className:"success",autoHideDelay:9000});
     }
 }
