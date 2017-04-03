@@ -568,6 +568,98 @@ function canCageAddUp(cage)
     }
 }
 
+function howManyCandidatesRow(row, candidate, blockNo)
+{
+    for (var x in 9)
+    {
+        var counter = 0;
+        for (var i in POSSIBLE)
+        {
+            if (returnRow(i) == row && returnBlock(i) == x)
+            {
+                for (j in POSSIBLE[i])
+                {
+                    if (POSSIBLE[i][j] == candidate)
+                    {
+                        counter += 1;
+                    }
+                }
+            }
+        }
+        blockNo = x;
+        return counter;
+    }
+}
+
+function howManyCandidatesCol(col, candidate, blockNo)
+{
+    for (var x in 9)
+    {
+        var counter = 0;
+        for (var i in POSSIBLE)
+        {
+            if (returnCol(i) == col && returnBlock(i) == x)
+            {
+                for (j in POSSIBLE[i])
+                {
+                    if (POSSIBLE[i][j] == candidate)
+                    {
+                        counter += 1;
+                    }
+                }
+            }
+        }
+        blockNo = x;
+        return counter;
+    }
+}
+
+function howManyCandidatesBlockCol(block, candidate, colNo)
+{
+    for (var x in 9)
+    {
+        var counter = 0;
+        for (var i in POSSIBLE)
+        {
+            if (returnBlock(i) == block && returnCol(i) == x)
+            {
+                for (j in POSSIBLE[i])
+                {
+                    if (POSSIBLE[i][j] == candidate)
+                    {
+                        counter += 1;
+                    }
+                }
+            }
+        }
+        colNo = x;
+        return counter;
+    }
+}
+
+function howManyCandidatesBlockRow(block, candidate, rowNo)
+{
+    for (var x in 9)
+    {
+        var counter = 0;
+        for (var i in POSSIBLE)
+        {
+            if (returnBlock(i) == block && returnRow(i) == x)
+            {
+                for (j in POSSIBLE[i])
+                {
+                    if (POSSIBLE[i][j] == candidate)
+                    {
+                        counter += 1;
+                    }
+                }
+            }
+        }
+        rowNo = x;
+        return counter;
+    }
+}
+
 /************************ STRATEGTY METHODS ************************/
 
 function nakedSingles()
@@ -807,56 +899,6 @@ function hiddenSingles()
     }
 }
 
-// function complexHiddenSingles()
-// {
-//     puzzle = PUZZLES[PUZZLE_POSITION];
-//     for (var i = 0; i < puzzle.length; i++)
-//     {
-//         // Iterate through each cage
-//         // For each possible number in each cell of the cage, compare it with all the other possible numbers in the other cells
-//         // If any numbers are the same, mark a flag
-//         // If at the end, the possible number in question is unique and the flag is still 0, then that number is the correct number for that cell
-//         var cells = puzzle[i].squares;
-//         var counter = 0;
-//         var cellCount = 0;
-//         loop:
-//         for (var j = 0; j < cells.length; j++)
-//         {
-//             for (var k = 0; k < POSSIBLE[cells[j]].length; k++)
-//             {
-//                 for (var l = 0; l < cells.length; l++)
-//                 {
-//                     if (l != j)
-//                     {
-//                         for (var m = 0; m < POSSIBLE[cells[l]].length; m++)
-//                         {
-//                             if (POSSIBLE[cells[j]][k] == POSSIBLE[cells[l]][m])
-//                             {
-//                                 continue;
-//                             }
-//                             else
-//                             {
-//                                 counter +=1;
-//                             }
-//                         }
-//                         if (counter == POSSIBLE[cells[l]].length)
-//                         {
-//                             cellCount += 1;
-//                         }
-//                     }
-//                 }
-//                 if (cellCount == cells.length - 1)
-//                 {
-//                     var tmp = POSSIBLE[cells[j]][k];
-//                     POSSIBLE[cells[j]].length = 0;
-//                     POSSIBLE[cells[j]].push(tmp);
-//                     break loop;
-//                 }
-//             }
-//         }
-//     }
-// }
-
 function nakedPairs()
 {
     for (var i = 0; i < POSSIBLE.length; i++)
@@ -903,6 +945,171 @@ function nakedPairs()
     }
 }
 
+function nakedTriples()
+{
+    for (var i = 0; i < POSSIBLE.length; i++)
+    {
+        var triple1 = 0;
+        var triple2 = 0;
+        var triple3 = 0;
+        var tripleCell1 = 0;
+        var tripleCell2 = 0;
+        var tripleCell3 = 0;
+        if (POSSIBLE[i].length == 3)
+        {
+            triple1 = POSSIBLE[i][0];
+            triple2 = POSSIBLE[i][1];
+            triple3 = POSSIBLE[i][2];
+            tripleCell1 = i;
+            for (var j = 0; j < POSSIBLE.length; j++)
+            {
+                if (j != i && (POSSIBLE[j].length == 2 || POSSIBLE[j].length == 3) && (returnRow(i) == returnRow(j) || returnCol(i) == returnCol(j) || returnBlock(i) == returnBlock(j) || returnCage(i) == returnCage(j)))
+                {
+                    for (var x = 0; x < POSSIBLE[j].length; x++)
+                    {
+                        var counter = 0;
+                        if (POSSIBLE[j][x] == triple1 || POSSIBLE[j][x] == triple2 || POSSIBLE[j][x] == triple3)
+                        {
+                            counter += 1;
+                        }
+                    }
+                    if (counter == POSSIBLE[j].length)
+                    {
+                        tripleCell2 = j;
+                        for (var k = 0; k < POSSIBLE.length; k++)
+                        {
+                            if (k != i && k != j && (POSSIBLE[k].length == 2 || POSSIBLE[k].length == 3) && (
+                            ( returnRow(tripleCell1) == returnRow(tripleCell2) && returnRow(tripleCell1) == returnRow(k) ) ||
+                            ( returnCol(tripleCell1) == returnCol(tripleCell2) && returnCol(tripleCell1) == returnCol(k) ) ||
+                            ( returnBlock(tripleCell1) == returnBlock(tripleCell2) && returnBlock(tripleCell1) == returnBlock(k) ) ||
+                            ( returnCage(tripleCell1) == returnCage(tripleCell2) && returnCage(tripleCell1) == returnCage(k) )
+                            ) )
+                            {
+                                for (var y = 0; y < POSSIBLE[k].length; y++)
+                                {
+                                    var counter1 = 0;
+                                    if (POSSIBLE[k][y] == triple1 || POSSIBLE[k][y] == triple2 || POSSIBLE[k][y] == triple3)
+                                    {
+                                        counter1 += 1;
+                                    }
+                                }
+                                if (counter1 == POSSIBLE[k].length)
+                                {
+                                    tripleCell3 = k;
+                                    for (var z = 0; z < POSSIBLE.length; z++)
+                                    {
+                                        if (z != tripleCell1 && z != tripleCell2 && z != tripleCell3)
+                                        {
+                                            for (var m = 0; m < POSSIBLE[z].length; m++)
+                                            {
+                                                if (POSSIBLE[z][m] != triple1 && POSSIBLE[z][m] != triple2 && POSSIBLE[z][m] != triple3)
+                                                {
+                                                    var tmp = POSSIBLE[z];
+                                                    POSSIBLE[z].splice(m, 1);
+                                                    if (canCageAddUp(returnCage(tripleCell1)) == false || canCageAddUp(returnCage(tripleCell2)) == false || canCageAddUp(returnCage(tripleCell3)) == false)
+                                                    {
+                                                        POSSIBLE[z] = tmp;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+function intersectionRemoval()
+{
+    for (var i in SUDOKU_VALUES)
+    {
+        for (var j in 9)
+        {
+            var blockNo = 0;
+            var colNo = 0;
+            var rowNo = 0;
+            if (howManyCandidatesRow(j, i, blockNo) == 2 || howManyCandidatesRow(j, i, blockNo) == 3)
+            {
+                for (x in POSSIBLE)
+                {
+                    if (returnBlock(x) == returnBlock(blockNo))
+                    {
+                        for (var y in POSSIBLE[x])
+                        {
+                            if (POSSIBLE[x][y] == i)
+                            {
+                                POSSIBLE[x].splice(y, 1);
+                            }
+                        }
+                    }
+                }
+            }
+            if (howManyCandidatesCol(j, i, blockNo) == 2 || howManyCandidatesCol(j, i, blockNo) == 3)
+            {
+                for (a in POSSIBLE)
+                {
+                    if (returnBlock(a) == returnBlock(blockNo))
+                    {
+                        for (var b in POSSIBLE[a])
+                        {
+                            if (POSSIBLE[a][b] == i)
+                            {
+                                POSSIBLE[a].splice(b, 1);
+                            }
+                        }
+                    }
+                }
+            }
+            if (howManyCandidatesBlockRow(j, i, rowNo) == 2 || howManyCandidatesBlockRow(j, i, rowNo) == 3)
+            {
+                for (c in POSSIBLE)
+                {
+                    if (returnRow(c) == returnRow(rowNo))
+                    {
+                        for (var d in POSSIBLE[c])
+                        {
+                            if (POSSIBLE[c][d] == i)
+                            {
+                                cnsole.log(rowNo);
+                                POSSIBLE[c].splice(d, 1);
+                            }
+                        }
+                    }
+                }
+            }
+            if (howManyCandidatesBlockCol(j, i, colNo) == 2 || howManyCandidatesBlockCol(j, i, colNo) == 3)
+            {
+                for (e in POSSIBLE)
+                {
+                    if (returnCol(e) == returnCol(colNo))
+                    {
+                        for (var f in POSSIBLE[e])
+                        {
+                            if (POSSIBLE[e][f] == i)
+                            {
+                                POSSIBLE[e].splice(f, 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 /******************** MAIN EXECUTION LOOP METHOD ********************/
 
 function hint()
@@ -919,6 +1126,12 @@ function hint()
         nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
         nakedPairs();
+        nakedSingles();
+        if (SOLVED_CELL_FLAG == 1) break;
+        nakedTriples();
+        nakedSingles();
+        if (SOLVED_CELL_FLAG == 1) break;
+        intersectionRemoval();
         nakedSingles();
         if (SOLVED_CELL_FLAG == 1) break;
         lastInCage();
