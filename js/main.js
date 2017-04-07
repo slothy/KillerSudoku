@@ -5,5 +5,6 @@ document.addEventListener("DOMContentLoaded", function(event)
     addCages(0);
     colourBoard();
     puzzleNo();
+    collectionOfUnits();
     console.log("Finished loading page");
 });
